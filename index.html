@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vivez Maroc</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+margin:0;
+padding:40px 10px;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+position:relative;
+}
+
+h1{
+text-align:center;
+color:#d35400;
+margin-bottom: 20px;
+}
+
+/* STYLE DES FILTRES AJOUTÉ */
+.filter-container {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+gap: 10px;
+margin-bottom: 20px;
+}
+
+.filter-btn {
+background: white;
+border: 2px solid #d35400;
+color: #d35400;
+padding: 8px 20px;
+border-radius: 25px;
+cursor: pointer;
+font-weight: bold;
+transition: 0.3s;
+}
+
+.filter-btn.active, .filter-btn:hover {
+background: #d35400;
+color: white;
+}
+
+.carousel-wrapper{
+position:relative;
+display:flex;
+align-items:center;
+}
+
+.carousel{
+display:flex;
+overflow-x:auto;
+scroll-snap-type:x mandatory;
+scroll-behavior:smooth;
+gap:30px;
+padding:40px 0;
+scrollbar-width:none;
+}
+
+.carousel::-webkit-scrollbar{
+display:none;
+}
+
+.card{
+flex:0 0 450px;
+scroll-snap-align:center;
+background:white;
+border-radius:15px;
+box-shadow:0 10px 20px rgba(0,0,0,0.1);
+overflow:hidden;
+transition:0.4s;
+position:relative;
+}
+
+.card img{
+width:100%;
+height:260px;
+object-fit:cover;
+}
+
+.card-content{
+padding:20px;
+}
+
+.type{
+color:#e67e22;
+font-size:12px;
+font-weight:bold;
+text-transform:uppercase;
+}
+
+h3{
+margin:10px 0;
+color:#2c3e50;
+}
+
+.lieu{
+color:#777;
+margin-bottom:10px;
+font-size:0.9rem;
+}
+
+p{
+color:#555;
+font-size:0.95rem;
+line-height:1.5;
+}
+
+/* Boutons navigation */
+
+.nav-btn{
+position:absolute;
+top:50%;
+transform:translateY(-50%);
+width:50px;
+height:50px;
+background:white;
+border:none;
+border-radius:50%;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+cursor:pointer;
+z-index:10;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:1.2rem;
+color:#d35400;
+transition:0.3s;
+}
+
+.nav-btn:hover{
+background:#d35400;
+color:white;
+}
+
+.prev{left:-25px;}
+.next{right:-25px;}
+
+/* Effet carte choisie */
+
+.selected-card{
+transform:scale(1.07);
+box-shadow:0 20px 45px rgba(0,0,0,0.35);
+border:3px solid #d35400;
+}
+
+.selected-card::after{
+content:"✨ Choisi par le destin";
+position:absolute;
+top:10px;
+right:10px;
+background:#d35400;
+color:white;
+padding:6px 12px;
+font-size:12px;
+border-radius:20px;
+}
+
+/* bouton destin */
+
+#destinyBtn:hover{
+transform:scale(1.05);
+}
+
+@media(max-width:700px){
+
+.card{
+flex:0 0 300px;
+}
+
+.nav-btn{
+width:40px;
+height:40px;
+}
+
+.prev{left:5px;}
+.next{right:5px;}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Vivez le Maroc</h1>
+
+<div class="filter-container" id="filterContainer">
+<button class="filter-btn active" onclick="filterType('Tous', this)">Tous</button>
+<button class="filter-btn" onclick="filterType('Désert', this)">Désert</button>
+<button class="filter-btn" onclick="filterType('Nature', this)">Nature</button>
+<button class="filter-btn" onclick="filterType('Sport', this)">Sport</button>
+<button class="filter-btn" onclick="filterType('Culture', this)">Culture</button>
+</div>
+
+<div class="carousel-wrapper">
+
+<button class="nav-btn prev" id="prevBtn">
+<i class="fas fa-chevron-left"></i>
+</button>
+
+<div class="carousel" id="carousel"></div>
+
+<button class="nav-btn next" id="nextBtn">
+<i class="fas fa-chevron-right"></i>
+</button>
+
+</div>
+
+<div style="text-align:center;margin-top:20px">
+
+<p style="font-size:1.1rem;color:#555;margin-bottom:10px">
+Vous êtes perdu ?
+</p>
+
+<button id="destinyBtn" style="
+background:#d35400;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:50px;
+cursor:pointer;
+font-weight:bold;
+font-size:1rem;
+transition:0.3s;
+box-shadow:0 4px 15px rgba(211,84,0,0.3);
+">
+
+<i class="fas fa-random"></i>
+Cliquez et laissez le destin choisir !
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const activites=[
+
+{titre:"Balade à dos de chameau",lieu:"Merzouga",type:"Désert",description:"Explorer les dunes de l'Erg Chebbi et dormir dans un camp berbère sous les étoiles.",image:"pic1.jpg"},
+
+{titre:"Nuit à Zagora",lieu:"Zagora",type:"Désert",description:"Une immersion saharienne authentique aux portes du désert, plus proche de Marrakech.",image:"pic2.jpg"},
+
+{titre:"Sandboard",lieu:"Erg Chebbi",type:"Aventure",description:"Dévalez les plus hautes dunes du Maroc sur une planche de surf des sables.",image:"pic3.jpg"},
+
+{titre:"Kitesurf",lieu:"Dakhla",type:"Sport",description:"Un lagon turquoise et des vents constants : le paradis mondial des kitesurfeurs.",image:"pic4.jpg"},
+
+{titre:"Surf",lieu:"Taghazout",type:"Sport",description:"Un village de pêcheurs devenu la capitale du surf avec des vagues légendaires.",image:"pic5.jpg"},
+
+{titre:"Excursion en bateau",lieu:"Essaouira",type:"Mer",description:"Naviguez autour des îles Purpuraires et dégustez des sardines grillées au port.",image:"pic6.jpg"},
+
+{titre:"Randonnée Atlas",lieu:"Haut Atlas",type:"Nature",description:"Traversez des villages en pisé et découvrez l'hospitalité légendaire des Berbères.",image:"pic7.jpg"},
+
+{titre:"Ascension Toubkal",lieu:"Mont Toubkal",type:"Nature",description:"Atteignez le point culminant de l'Afrique du Nord à 4167 mètres d'altitude.",image:"pic8.jpg"},
+
+{titre:"Cascades d'Ouzoud",lieu:"Azilal",type:"Nature",description:"Admirez des chutes d'eau de 110m et rencontrez les singes sauvages de la forêt.",image:"pic9.jpg"},
+
+{titre:"Médina de Fès",lieu:"Fès",type:"Culture",description:"Plongez dans l'histoire au cœur de la plus ancienne médina médiévale au monde.",image:"pic10.jpg"},
+
+{titre:"Mosquée Hassan II",lieu:"Casablanca",type:"Culture",description:"Un joyau architectural construit sur l'Atlantique avec un minaret de 210m.",image:"pic11.jpg"},
+
+{titre:"Chefchaouen",lieu:"Chefchaouen",type:"Ville",description:"Flânez dans les ruelles bleues et profitez de l'atmosphère paisible de cette ville.",image:"pic12.jpg"},
+
+{titre:"Quad Agafay",lieu:"Désert d'Agafay",type:"Aventure",description:"Une aventure mécanique intense dans un désert de pierre face à l'Atlas.",image:"pic13.jpg"},
+
+{titre:"Vol en Montgolfière",lieu:"Marrakech",type:"Unique",description:"Survolez les montagnes de l'Atlas au lever du soleil pour une vue inoubliable.",image:"pic14.jpg"}
+
+];
+
+const carousel=document.getElementById("carousel");
+
+// FONCTION POUR AFFICHER LES CARTES
+function displayActivites(data) {
+carousel.innerHTML = "";
+data.forEach((act,index)=>{
+carousel.innerHTML+=`
+<div class="card" id="card-${index}">
+<img src="${act.image}" alt="${act.titre}">
+<div class="card-content">
+<span class="type">${act.type}</span>
+<h3>${act.titre}</h3>
+<div class="lieu"><i class="fas fa-map-marker-alt"></i> ${act.lieu}</div>
+<p>${act.description}</p>
+</div>
+</div>
+`;
+});
+}
+
+// LOGIQUE DES FILTRES
+function filterType(type, btn) {
+// Gérer le style des boutons
+document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+btn.classList.add('active');
+
+// Filtrer les données
+if (type === 'Tous') {
+displayActivites(activites);
+} else {
+const filtered = activites.filter(act => act.type === type);
+displayActivites(filtered);
+}
+}
+
+// Affichage initial
+displayActivites(activites);
+
+const nextBtn=document.getElementById("nextBtn");
+const prevBtn=document.getElementById("prevBtn");
+
+nextBtn.onclick=()=>{
+const cardWidth=carousel.querySelector('.card').offsetWidth+30;
+carousel.scrollBy({left:cardWidth,behavior:'smooth'});
+}
+
+prevBtn.onclick=()=>{
+const cardWidth=carousel.querySelector('.card').offsetWidth+30;
+carousel.scrollBy({left:-cardWidth,behavior:'smooth'});
+}
+
+const destinyBtn=document.getElementById("destinyBtn");
+
+destinyBtn.onclick=()=>{
+destinyBtn.disabled=true;
+destinyBtn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Le destin réfléchit...';
+
+setTimeout(()=>{
+// On remet tout pour que le destin puisse choisir parmi TOUTES les activités
+filterType('Tous', document.querySelector('.filter-btn'));
+
+const randomIndex=Math.floor(Math.random()*activites.length);
+const targetCard=document.getElementById(`card-${randomIndex}`);
+
+const cardOffset=targetCard.offsetLeft;
+const carouselWidth=carousel.offsetWidth;
+const cardWidth=targetCard.offsetWidth;
+
+const scrollPos=cardOffset-(carouselWidth/2)+(cardWidth/2);
+
+carousel.scrollTo({left:scrollPos,behavior:'smooth'});
+
+document.querySelectorAll('.card').forEach(c=>c.classList.remove('selected-card'));
+targetCard.classList.add('selected-card');
+
+destinyBtn.disabled=false;
+destinyBtn.innerHTML='<i class="fas fa-random"></i> Cliquez et laissez le destin choisir !';
+
+setTimeout(()=>{
+targetCard.classList.remove('selected-card');
+},3000);
+
+},800);
+}
+
+</script>
+
+</body>
+</html>
